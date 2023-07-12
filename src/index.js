@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { Server } from "socket.io";
 import http from "http";
+import Filter from "bad-words";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -19,6 +20,10 @@ io.on("connection", (socket) => {
   socket.broadcast.emit("message", "A new user has joined the Chat!");
 
   socket.on("newMessage", (clientMessage, ack_callback) => {
+    //Filtering Profanity
+    const filter = new Filter();
+    clientMessage = filter.clean(clientMessage);
+
     io.emit("message", clientMessage);
     ack_callback();
   });

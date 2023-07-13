@@ -4,9 +4,21 @@ const $messageForm = document.getElementById("message-form");
 const $messageInput = $messageForm.querySelector("input");
 const $messageFormBtn = $messageForm.querySelector("button");
 const $locationButton = document.getElementById("share-location");
+const $messageBox = document.getElementById("message-inbox");
+const $msgScriptBox = document.getElementById("message-template");
+const $locationScriptBox = document.getElementById("location-template");
 
 socket.on("message", (msg) => {
+  const html = Mustache.render($msgScriptBox.innerHTML, { message: msg });
+  $messageBox.insertAdjacentHTML("beforeend", html);
   console.log(msg);
+});
+
+socket.on("locationMessage", (locationURL) => {
+  const html = Mustache.render($locationScriptBox.innerHTML, {
+    link: locationURL,
+  });
+  $messageBox.insertAdjacentHTML("beforeend", html);
 });
 
 $messageForm.addEventListener("submit", (e) => {
@@ -16,6 +28,7 @@ $messageForm.addEventListener("submit", (e) => {
 
   //using name property on input field
   const message = e.target.elements.message.value;
+
   socket.emit("newMessage", message, () => {
     $messageFormBtn.removeAttribute("disabled");
     $messageInput.focus();

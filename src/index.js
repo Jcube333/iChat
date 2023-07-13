@@ -29,7 +29,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendLocation", (loc, ack_callback) => {
-    io.emit("message", `https://google.com/maps?q=${loc.lat},${loc.long}`);
+    io.emit(
+      "locationMessage",
+      `https://google.com/maps?q=${loc.lat},${loc.long}`
+    );
     ack_callback("Location Shared");
   });
 

@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import http from "http";
 import Filter from "bad-words";
 import { fileURLToPath } from "url";
+import { generateMsg } from "./utils/generateMsg.js";
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -15,8 +16,7 @@ const io = new Server(server);
 app.use(express.json());
 
 io.on("connection", (socket) => {
-  const welcomeMsg = "Welcome";
-  socket.emit("message", welcomeMsg);
+  socket.emit("message", generateMsg("Welcome"));
   socket.broadcast.emit("message", "A new user has joined the Chat!");
 
   socket.on("newMessage", (clientMessage, ack_callback) => {
@@ -24,14 +24,14 @@ io.on("connection", (socket) => {
     const filter = new Filter();
     clientMessage = filter.clean(clientMessage);
 
-    io.emit("message", clientMessage);
+    io.emit("message", generateMsg(clientMessage));
     ack_callback();
   });
 
   socket.on("sendLocation", (loc, ack_callback) => {
     io.emit(
       "locationMessage",
-      `https://google.com/maps?q=${loc.lat},${loc.long}`
+      generateMsg(`https://google.com/maps?q=${loc.lat},${loc.long}`)
     );
     ack_callback("Location Shared");
   });

@@ -1,4 +1,5 @@
 # Logs
+*.code-workspace
 .env
 logs
 *.log

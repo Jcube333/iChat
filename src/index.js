@@ -16,8 +16,15 @@ const io = new Server(server);
 app.use(express.json());
 
 io.on("connection", (socket) => {
-  socket.emit("message", generateMsg("Welcome"));
-  socket.broadcast.emit("message", "A new user has joined the Chat!");
+  socket.on("join", ({ username, room }) => {
+    socket.join(room);
+
+    socket.emit("message", generateMsg(`Welcome ${username}`));
+
+    socket.broadcast
+      .to(room)
+      .emit("message", generateMsg(`${username} has joined the Chat!`));
+  });
 
   socket.on("newMessage", (clientMessage, ack_callback) => {
     //Filtering Profanity

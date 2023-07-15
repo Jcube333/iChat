@@ -8,14 +8,18 @@ const $messageBox = document.getElementById("message-inbox");
 const $msgScriptBox = document.getElementById("message-template");
 const $locationScriptBox = document.getElementById("location-template");
 
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+});
+
 socket.on("message", (msg) => {
   console.log(msg);
   const html = Mustache.render($msgScriptBox.innerHTML, {
     message: msg.text,
     createdAt: moment(msg.createdAt).format("h:mm a"),
   });
+
   $messageBox.insertAdjacentHTML("beforeend", html);
-  console.log(msg);
 });
 
 socket.on("locationMessage", (msg) => {
@@ -61,3 +65,5 @@ $locationButton.addEventListener("click", () => {
     );
   });
 });
+
+socket.emit("join", { username, room });

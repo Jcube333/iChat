@@ -1,5 +1,6 @@
-export const generateMsg = (text) => {
+export const generateMsg = (text, username) => {
   return {
+    username,
     text,
     createdAt: new Date().getTime(),
   };

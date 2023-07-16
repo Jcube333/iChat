@@ -5,6 +5,7 @@ import http from "http";
 import Filter from "bad-words";
 import { fileURLToPath } from "url";
 import { generateMsg } from "./utils/generateMsg.js";
+import { addUser, removeUser, getUser, getUsersInRoom } from "./utils/user.js";
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -16,14 +17,24 @@ const io = new Server(server);
 app.use(express.json());
 
 io.on("connection", (socket) => {
-  socket.on("join", ({ username, room }) => {
-    socket.join(room);
+  socket.on("join", ({ username, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, username, room });
 
-    socket.emit("message", generateMsg(`Welcome ${username}`));
+    if (error) {
+      return callback(error);
+    }
+
+    //user.room is cleaned(trim+lowecase) in the addUser function
+    socket.join(user.room);
+
+    socket.emit("message", generateMsg(`Welcome ${user.username}`, "Admin"));
 
     socket.broadcast
-      .to(room)
-      .emit("message", generateMsg(`${username} has joined the Chat!`));
+      .to(user.room)
+      .emit(
+        "message",
+        generateMsg(`${user.username} has joined the Chat!`, "Admin")
+      );
   });
 
   socket.on("newMessage", (clientMessage, ack_callback) => {
@@ -31,20 +42,34 @@ io.on("connection", (socket) => {
     const filter = new Filter();
     clientMessage = filter.clean(clientMessage);
 
-    io.emit("message", generateMsg(clientMessage));
+    const user = getUser(socket.id);
+
+    io.to(user.room).emit("message", generateMsg(clientMessage, user.username));
     ack_callback();
   });
 
   socket.on("sendLocation", (loc, ack_callback) => {
-    io.emit(
+    const user = getUser(socket.id);
+
+    io.to(user.room).emit(
       "locationMessage",
-      generateMsg(`https://google.com/maps?q=${loc.lat},${loc.long}`)
+      generateMsg(
+        `https://google.com/maps?q=${loc.lat},${loc.long}`,
+        user.username
+      )
     );
     ack_callback("Location Shared");
   });
 
   socket.on("disconnect", () => {
-    io.emit("message", "A user has left the chat");
+    const exitUser = removeUser(socket.id);
+
+    if (exitUser) {
+      io.to(exitUser.room).emit(
+        "message",
+        generateMsg(`${exitUser.username} has left the chat`, "Admin")
+      );
+    }
   });
 });
 

@@ -10,7 +10,7 @@
 
   <body>
     <div class="chat">
-      <div class="chat__sidebar"></div>
+      <div id="userBox" class="chat__sidebar"></div>
       <div class="chat__main">
         <div id="message-inbox" class="chat__messages"></div>
 
@@ -28,7 +28,7 @@
     <script id="message-template" type="text/html">
       <div class="message">
         <p>
-          <span calss="message__name">{{username}}</span>
+          <span class="message__name">{{username}}</span>
           <span class="message__meta">{{createdAt}}</span>
         </p>
         <p>{{message}}</p>
@@ -44,6 +44,24 @@
         </p>
         <p><a href="{{link}}" target="_blank"> My current Location</a></p>
       </div>
+    </script>
+
+    <!-- Sidebar Users Template -->
+    <script id="sidebar-template" type="text/html">
+      <h1 class="room-title">{{room}}</h1>
+      <h2 class="list-title">Users</h2>
+
+      <ul class="users">
+        <!--Syntax for iterating over an array -->
+        {{#users}}
+
+        <li class="individual-user">
+          <span style="background-color:{{color}}" class="user-avatar"
+            >{{initial}}</span
+          >{{username}}
+        </li>
+        {{/users}}
+      </ul>
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>

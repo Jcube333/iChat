@@ -1,6 +1,12 @@
 //addUser,removeUser getUser, getUsersInRoom
 const users = [];
 
+//Random Color generator
+function getRandomColor() {
+  let color = "hsl(" + Math.random() * 360 + ", 100%, 75%)";
+  return color;
+}
+
 export const addUser = ({ id, username, room }) => {
   //Data cleaning
   username = username.trim().toLowerCase();
@@ -47,7 +53,12 @@ export const getUsersInRoom = (room) => {
   const usersInRoom = [];
 
   users.forEach((user) => {
-    if (user.room === room) usersInRoom.push(user);
+    if (user.room === room)
+      usersInRoom.push({
+        ...user,
+        initial: user.username[0].toUpperCase(),
+        color: getRandomColor(),
+      });
   });
 
   return usersInRoom;

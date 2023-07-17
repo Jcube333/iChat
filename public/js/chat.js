@@ -5,8 +5,10 @@ const $messageInput = $messageForm.querySelector("input");
 const $messageFormBtn = $messageForm.querySelector("button");
 const $locationButton = document.getElementById("share-location");
 const $messageBox = document.getElementById("message-inbox");
+const $sidebarUser = document.getElementById("userBox");
 const $msgScriptBox = document.getElementById("message-template");
 const $locationScriptBox = document.getElementById("location-template");
+const $sideBarScriptBox = document.getElementById("sidebar-template");
 
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -14,6 +16,8 @@ const { username, room } = Qs.parse(location.search, {
 
 socket.on("message", (msg) => {
   console.log(msg);
+
+  //Compiled HTML by Mustache after relevant insertions
   const html = Mustache.render($msgScriptBox.innerHTML, {
     username: msg.username,
     message: msg.text,
@@ -30,6 +34,15 @@ socket.on("locationMessage", (msg) => {
     createdAt: moment(msg.createdAt).format("h:mm a"),
   });
   $messageBox.insertAdjacentHTML("beforeend", html);
+});
+
+//Sidebar User's List
+socket.on("roomData", ({ room, users }) => {
+  const html = Mustache.render($sideBarScriptBox.innerHTML, {
+    room,
+    users,
+  });
+  $sidebarUser.innerHTML = html;
 });
 
 //Form Submit Event

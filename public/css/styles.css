@@ -98,6 +98,20 @@ button:disabled {
   overflow-y: scroll;
 }
 
+.individual-user {
+  border: 1px solid rgb(102, 169, 227);
+  border-radius: 20px;
+  padding: 15px 15px;
+  margin-bottom: 10px;
+}
+
+.user-avatar {
+  margin-right: 10px;
+  border-radius: 80%;
+  width: 20%;
+  padding: 8px;
+}
+
 /* Chat styles */
 
 .chat__main {

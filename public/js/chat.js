@@ -1,5 +1,6 @@
 const socket = io();
 
+//$ denotes elements
 const $messageForm = document.getElementById("message-form");
 const $messageInput = $messageForm.querySelector("input");
 const $messageFormBtn = $messageForm.querySelector("button");
@@ -9,6 +10,31 @@ const $sidebarUser = document.getElementById("userBox");
 const $msgScriptBox = document.getElementById("message-template");
 const $locationScriptBox = document.getElementById("location-template");
 const $sideBarScriptBox = document.getElementById("sidebar-template");
+
+const autoscroll = () => {
+  //Most recent message Element and its height with margin
+  const $newMessage = $messageBox.lastElementChild;
+
+  const newMessageStyles = getComputedStyle($newMessage);
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+  const newMessageHeight = $newMessage.offsetHeight + newMessageMargin;
+
+  //Currently visible height..fixed as per view
+  const visible = $messageBox.offsetHeight;
+
+  //Complete Height of message Container
+  const containerHeight = $messageBox.scrollHeight;
+
+  //Where am i currently located?
+  const currPosition = $messageBox.scrollTop + visible;
+
+  //scrollOffset= height till top end of scrollBar + current visible ht
+  //i.e. scrollOffset=height till current position on page.
+
+  if (containerHeight - newMessageHeight <= currPosition) {
+    $messageBox.scrollTop = $messageBox.scrollHeight;
+  }
+};
 
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -25,6 +51,7 @@ socket.on("message", (msg) => {
   });
 
   $messageBox.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 socket.on("locationMessage", (msg) => {
@@ -34,6 +61,7 @@ socket.on("locationMessage", (msg) => {
     createdAt: moment(msg.createdAt).format("h:mm a"),
   });
   $messageBox.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 //Sidebar User's List
